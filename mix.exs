@@ -12,8 +12,12 @@ defmodule Blog.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger],
+    [applications: elixir_apps,
      mod: {Blog, []}]
+  end
+
+  defp elixir_apps do
+    [:logger, :postgrex, :ecto]
   end
 
   # Dependencies can be Hex packages:
@@ -26,6 +30,7 @@ defmodule Blog.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [{:postgrex, ">= 0.0.0"},
+     {:ecto,     "~> 0.2.5"}]
   end
 end
