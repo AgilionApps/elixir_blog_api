@@ -1,0 +1,14 @@
+{
+  "lib/blog/*.ex": {
+    "command": "lib",
+    "template": [ "defmodule Blog.{camelcase|dot} do", "", "end" ],
+    "alternate": "test/blog/{}_test.exs"
+  },
+  "test/chat/*_test.exs": {
+    "command": "test",
+    "template": [ "defmodule Blog.{camelcase|dot}Test do", "  use ExUnit.Case, async: true", "end" ],
+    "alternate": "lib/blog/{}.ex"
+  },
+  "mix.exs": { "command": "mix"},
+  "README.md": { "command": "readme" }
+}
