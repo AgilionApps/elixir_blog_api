@@ -1,33 +1,31 @@
-defmodule Blog.Models.Post do
+defmodule Blog.Models.Comment do
   use    Ecto.Model
   import Ecto.Query, only: [from: 2]
   alias  Blog.Repo
 
-  schema "posts" do
-    field :title,      :string
+  schema "comments" do
     field :body,       :string
-    field :posted_at,  :datetime
     field :created_at, :datetime
     field :updated_at, :datetime
 
-    has_many :comments, Blog.Models.Post
+    belongs_to :post, Blog.Models.Post
   end
 
-  validate post,
-    title: present(),
-    body:  present()
+  validate comment,
+    body:    present(),
+    post_id: present()
 
   def find(id) do
     Repo.one(from t in __MODULE__, where: t.id == ^id)
   end
 
   @doc """
-  Validates and creates a post given a map of attributes
+  Validates and creates a comment given a map of attributes
   """
   def create(params) do
     model = %__MODULE__{
-      title: params[:title],
-      body:  params[:body]
+      body:    params[:body],
+      post_id: params[:post_id]
     }
 
     case validate(model) do
