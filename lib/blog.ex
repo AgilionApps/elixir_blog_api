@@ -8,7 +8,8 @@ defmodule Blog do
 
     children = [
       # Define workers and child supervisors to be supervised
-      worker(Blog.Repo, [])
+      worker(Blog.Repo, []),
+      Plug.Adapters.Cowboy.child_spec(:http, Blog.Api, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
