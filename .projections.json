@@ -4,11 +4,23 @@
     "template": [ "defmodule Blog.{camelcase|dot} do", "", "end" ],
     "alternate": "test/blog/{}_test.exs"
   },
-  "test/chat/*_test.exs": {
+  "test/blog/*_test.exs": {
     "command": "test",
-    "template": [ "defmodule Blog.{camelcase|dot}Test do", "  use ExUnit.Case, async: true", "end" ],
+    "template": [ "defmodule Blog.{camelcase|dot}Test do", "  use BlogTest.Case", "end" ],
     "alternate": "lib/blog/{}.ex"
   },
+  "lib/blog/models/*.ex": {
+    "command": "model",
+    "template": [ "defmodule Blog.Models.{camelcase|dot} do", "", "end" ],
+    "alternate": "test/blog/models/{}_test.exs"
+  },
+  "test/blog/models/*_test.exs": {
+    "command": "mtest",
+    "template": [ "defmodule Blog.Models.{camelcase|dot}Test do", "  use BlogTest.Case", "end" ],
+    "alternate": "lib/blog/models/{}.ex"
+  },
+  "lib/blog.ex": { "command": "sup", "alternate": "test/blog_test.exs" },
+  "priv/repo/migrations/*.exs": { "command": "migration" },
   "mix.exs": { "command": "mix"},
   "README.md": { "command": "readme" }
 }
