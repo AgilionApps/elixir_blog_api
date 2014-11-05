@@ -10,12 +10,16 @@ defmodule Blog.Models.Post do
     field :created_at, :datetime
     field :updated_at, :datetime
 
-    has_many :comments, Blog.Models.Post
+    has_many :comments, Blog.Models.Comments
   end
 
   validate post,
     title: present(),
     body:  present()
+
+  def all do
+    Repo.all(__MODULE__)
+  end
 
   def find(id) do
     Repo.one(from t in __MODULE__, where: t.id == ^id)

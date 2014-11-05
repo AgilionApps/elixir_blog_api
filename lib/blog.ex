@@ -17,4 +17,9 @@ defmodule Blog do
     opts = [strategy: :one_for_one, name: Blog.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
+  @doc "Hot reload all application code"
+  def reload do
+    Mix.Tasks.Compile.Elixir.run(["--ignore-module-conflict"])
+  end
 end

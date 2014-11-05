@@ -9,6 +9,16 @@
     "template": [ "defmodule Blog.{camelcase|dot}Test do", "  use BlogTest.Case", "end" ],
     "alternate": "lib/blog/{}.ex"
   },
+  "lib/blog/api/*.ex": {
+    "command": "api",
+    "template": [ "defmodule Blog.Api.{camelcase|dot} do", "", "end" ],
+    "alternate": "test/blog/api/{}_test.exs"
+  },
+  "test/blog/api/*_test.exs": {
+    "command": "request_test",
+    "template": [ "defmodule Blog.Api.{camelcase|dot}Test do", "  use BlogTest.Case", "end" ],
+    "alternate": "lib/blog/api/{}.ex"
+  },
   "lib/blog/models/*.ex": {
     "command": "model",
     "template": [ "defmodule Blog.Models.{camelcase|dot} do", "", "end" ],

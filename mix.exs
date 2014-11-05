@@ -33,6 +33,7 @@ defmodule Blog.Mixfile do
     [{:postgrex, ">= 0.0.0"},
      {:ecto,     "~> 0.2.5"},
      {:cowboy,   "~> 1.0.0"},
-     {:plug,     "~> 0.8.2"}]
+     {:plug,     "~> 0.8.2"},
+     {:poison,   "~> 1.2.0"}]
   end
 end
