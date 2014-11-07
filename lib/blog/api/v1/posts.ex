@@ -3,6 +3,8 @@ defmodule Blog.Api.V1.Posts do
   use Plug.Router
   alias Blog.Models.Post
 
+  @serializer Blog.Serializers.V1.Post
+
   plug :match
   plug :dispatch
 
@@ -22,7 +24,11 @@ defmodule Blog.Api.V1.Posts do
   end
 
   def send_json(conn, status, model) do
-    json = model |> Poison.Encoder.encode([])
-    send_resp(conn, 200, json)
+    json = model
+      |> @serializer.as_json
+      #|> Blog.Adapters.JsonApi.adapt
+      |> Poison.Encoder.encode([])
+    conn = put_resp_header(conn, "content-type", "application/vnd.api+json")
+    send_resp(conn, status, json)
   end
 end
