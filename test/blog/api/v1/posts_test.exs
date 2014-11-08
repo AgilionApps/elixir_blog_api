@@ -14,9 +14,23 @@ defmodule Blog.Api.V1.PostsTest do
     {:ok, cmnt4} = Comment.create(%{body: "cmnt4", post_id: post2.id})
 
     expected = %{
-      posts: [
-        %{title: "foo", body: "baz", links: %{comments: [cmnt1.id, cmnt2.id]}},
-        %{title: "fu", body: "bar", links: %{comments: [cmnt3.id, cmnt4.id]}}
+      "posts" => [
+        %{
+          "title"       => "foo",
+          "body"        => "baz",
+          "isPublished" => false,
+          "links"       =>  %{
+            "comments" => [cmnt1.id, cmnt2.id]
+          }
+        },
+        %{
+          "title"       => "fu",
+          "body"        => "bar",
+          "isPublished" => false,
+          "links"       =>  %{
+            "comments" => [cmnt3.id, cmnt4.id]
+          }
+        },
       ]
     }
 
@@ -26,7 +40,7 @@ defmodule Blog.Api.V1.PostsTest do
 
     assert 200 = response.status
     assert ["application/vnd.api+json"] = get_resp_header(response, "content-type")
-    assert expected == Poison.decode!(response.resp_body, keys: :atoms!)
+    assert expected == Poison.decode!(response.resp_body)
   end
 
   test "GET /v1/posts/:id" do
@@ -39,18 +53,19 @@ defmodule Blog.Api.V1.PostsTest do
     response = Blog.Api.call(conn, [])
 
     expected = %{
-      post: %{
-        title: "foo",
-        body: "baz",
-        links: %{
-          comments: [cmnt1.id, cmnt2.id]
+      "posts" => %{
+        "title"       => "foo",
+        "body"        => "baz",
+        "isPublished" => false,
+        "links"       =>  %{
+          "comments" => [cmnt1.id, cmnt2.id]
         }
       }
     }
 
     assert 200 = response.status
     assert ["application/vnd.api+json"] = get_resp_header(response, "content-type")
-    assert expected == Poison.decode!(response.resp_body, keys: :atoms!)
+    assert expected == Poison.decode!(response.resp_body)
   end
 
   test "GET /v1/posts/:id - 404" do

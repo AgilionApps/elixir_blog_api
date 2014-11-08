@@ -38,17 +38,17 @@ defmodule Blog.Serializer do
       end
 
       def as_json(model) do
-        [Blog.Serializer.normalize(model, __MODULE__, @key, @attributes, @relations)]
+        Blog.Serializer.normalize(model, __MODULE__, @key, @attributes, @relations)
       end
     end
   end
 
   def normalize(model, module, key, attributes, relations) do
-    %{
+    [%{
       type: key,
       attributes: attribute_map(model, module, attributes),
       relations: []
-    }
+    }]
   end
 
   defp attribute_map(model, module, attributes) do
