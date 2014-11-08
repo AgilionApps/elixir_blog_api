@@ -16,17 +16,19 @@ defmodule Blog.Api.V1.PostsTest do
     expected = %{
       "posts" => [
         %{
-          "title"       => "foo",
           "body"        => "baz",
+          "id"          => post1.id,
           "isPublished" => false,
+          "title"       => "foo",
           "links"       =>  %{
             "comments" => [cmnt1.id, cmnt2.id]
           }
         },
         %{
-          "title"       => "fu",
           "body"        => "bar",
+          "id"          => post2.id,
           "isPublished" => false,
+          "title"       => "fu",
           "links"       =>  %{
             "comments" => [cmnt3.id, cmnt4.id]
           }
@@ -54,8 +56,9 @@ defmodule Blog.Api.V1.PostsTest do
 
     expected = %{
       "posts" => %{
-        "title"       => "foo",
         "body"        => "baz",
+        "id"          => post1.id,
+        "title"       => "foo",
         "isPublished" => false,
         "links"       =>  %{
           "comments" => [cmnt1.id, cmnt2.id]
