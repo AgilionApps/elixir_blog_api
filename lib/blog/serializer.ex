@@ -6,6 +6,7 @@ defmodule Blog.Serializer do
       import Blog.Serializer, only: [serialize: 2]
 
       @attributes []
+      @relations []
 
       # Rune before compile hook before compiling
       @before_compile Blog.Serializer
@@ -14,7 +15,7 @@ defmodule Blog.Serializer do
 
   defmacro serialize(key, do: block) do
     quote do
-      import Blog.Serializer, only: [attributes: 1]
+      import Blog.Serializer, only: [attributes: 1, has_many: 2]
 
       @key unquote(key)
       unquote(block)
@@ -25,6 +26,12 @@ defmodule Blog.Serializer do
     quote do
       # Add attributes to existing attributes array
       @attributes @attributes ++ unquote(atts)
+    end
+  end
+
+  defmacro has_many(name, opts) do
+    quote do
+      @relations [{:has_many, unquote(name), unquote(opts)} | @relations]
     end
   end
 
@@ -47,16 +54,27 @@ defmodule Blog.Serializer do
     [%{
       type: key,
       attributes: attribute_map(model, module, attributes),
-      relations: []
+      relations: relations_map(model, module, relations)
     }]
   end
 
   defp attribute_map(model, module, attributes) do
-    Enum.reduce attributes, %{}, fn(attr, map) ->
+    Enum.reduce attributes, %{}, fn(attr, results) ->
       case Map.fetch(model, attr) do
-        {:ok, val} -> Map.put(map, attr, val)
-        :error     -> Map.put(map, attr, apply(module, attr, [model]))
+        {:ok, val} -> Map.put(results, attr, val)
+        :error     -> Map.put(results, attr, apply(module, attr, [model]))
       end
+    end
+  end
+
+  defp relations_map(model, module, relations) do
+    Enum.reduce relations, %{}, fn({type, name, opts}, results) ->
+      relation_value = cond do
+        opts[:ids] && opts[:fn] -> apply(module, opts[:fn], [model])
+        opts[:ids]              -> apply(module, name, [model])
+        #TODO: link urls
+      end
+      Map.put(results, name, relation_value)
     end
   end
 end

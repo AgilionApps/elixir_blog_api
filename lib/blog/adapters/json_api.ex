@@ -18,7 +18,7 @@ defmodule Blog.Adapters.JsonApi do
   end
 
   def format(model) do
-    model[:attributes]
+    Map.put(model[:attributes], :links, model[:relations])
   end
 
   def reorder_models(models) do
