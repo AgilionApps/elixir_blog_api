@@ -1,5 +1,5 @@
 defmodule Blog.Serializers.V1.Post do
-  use Blog.Serializer
+  use JsonApi.Serializer
 
   serialize "posts" do
     attributes [:id, :title, :body, :is_published]

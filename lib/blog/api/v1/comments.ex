@@ -1,22 +1,17 @@
 defmodule Blog.Api.V1.Comments do
-  import Plug.Conn
-  use Plug.Router
-  use JsonApi.Responders
+  use JsonApi.Router
   alias Blog.Models.Comment
 
-  @serializer Blog.Serializers.V1.Comment
-
-  plug :match
-  plug :dispatch
+  serializer Blog.Serializers.V1.Comment
 
   get "/" do
-    send_json(conn, 200, Comment.all)
+    okay(conn, Comment.all)
   end
 
   get "/:ids" do
     case Comment.find(ids) do
-      nil   -> send_resp(conn, 404, "")
-      posts -> send_json(conn, 200, posts)
+      nil   -> not_found(conn)
+      posts -> okay(conn, posts)
     end
   end
 end

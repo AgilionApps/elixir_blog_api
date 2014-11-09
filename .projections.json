@@ -1,13 +1,13 @@
 {
-  "lib/blog/*.ex": {
+  "lib/*.ex": {
     "command": "lib",
-    "template": [ "defmodule Blog.{camelcase|dot} do", "", "end" ],
-    "alternate": "test/blog/{}_test.exs"
+    "template": [ "defmodule {camelcase|dot} do", "", "end" ],
+    "alternate": "test/{}_test.exs"
   },
-  "test/blog/*_test.exs": {
+  "test/*_test.exs": {
     "command": "test",
-    "template": [ "defmodule Blog.{camelcase|dot}Test do", "  use BlogTest.Case", "end" ],
-    "alternate": "lib/blog/{}.ex"
+    "template": [ "defmodule {camelcase|dot}Test do", "  use BlogTest.Case", "end" ],
+    "alternate": "lib/{}.ex"
   },
   "lib/blog/api/*.ex": {
     "command": "api",

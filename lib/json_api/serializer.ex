@@ -1,21 +1,24 @@
-defmodule Blog.Serializer do
+defmodule JsonApi.Serializer do
 
   @doc false
   defmacro __using__(_) do
     quote do
-      import Blog.Serializer, only: [serialize: 2]
 
+      Module.register_attribute __MODULE__, :attributes, persist: true
       @attributes []
       @relations []
+      @key nil
+
+      import JsonApi.Serializer, only: [serialize: 2]
 
       # Rune before compile hook before compiling
-      @before_compile Blog.Serializer
+      @before_compile JsonApi.Serializer
     end
   end
 
   defmacro serialize(key, do: block) do
     quote do
-      import Blog.Serializer, only: [attributes: 1, has_many: 2, belongs_to: 2]
+      import JsonApi.Serializer, only: [attributes: 1, has_many: 2, belongs_to: 2]
 
       @key unquote(key)
       unquote(block)
@@ -42,16 +45,16 @@ defmodule Blog.Serializer do
   end
 
   @doc false
-  defmacro __before_compile__(env) do
+  defmacro __before_compile__(_env) do
     quote do
       def as_json(models) when is_list(models) do
         Enum.flat_map models, fn(model) ->
-          Blog.Serializer.normalize(model, __MODULE__, @key, @attributes, @relations)
+          JsonApi.Serializer.normalize(model, __MODULE__, @key, @attributes, @relations)
         end
       end
 
       def as_json(model) do
-        Blog.Serializer.normalize(model, __MODULE__, @key, @attributes, @relations)
+        JsonApi.Serializer.normalize(model, __MODULE__, @key, @attributes, @relations)
       end
     end
   end
@@ -74,7 +77,7 @@ defmodule Blog.Serializer do
   end
 
   defp relations_map(model, module, relations) do
-    Enum.reduce relations, %{}, fn({type, name, opts}, results) ->
+    Enum.reduce relations, %{}, fn({_type, name, opts}, results) ->
       relation_value = cond do
         opts[:ids] && opts[:fn] -> apply(module, opts[:fn], [model])
         opts[:ids]              -> apply(module, name, [model])

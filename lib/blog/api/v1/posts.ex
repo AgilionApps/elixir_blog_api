@@ -1,27 +1,21 @@
 defmodule Blog.Api.V1.Posts do
-  import Plug.Conn
-  use Plug.Router
-  use JsonApi.Responders
+  use JsonApi.Router
   alias Blog.Models.Post
 
-  @serializer Blog.Serializers.V1.Post
-
-  plug :match
-  plug :dispatch
+  serializer Blog.Serializers.V1.Post
 
   get "/" do
-    send_json(conn, 200, Post.all)
+    okay(conn, Post.all)
   end
 
   get ":id" do
     case Post.find(String.to_integer(id)) do
-      nil  -> send_resp(conn, 404, "")
-      post -> send_json(conn, 200, post)
+      nil  -> not_found(conn)
+      post -> okay(conn, post)
     end
   end
 
   match _ do
-    send_not_found(conn)
+    not_found(conn)
   end
-
 end

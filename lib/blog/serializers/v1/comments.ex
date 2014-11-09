@@ -1,5 +1,5 @@
 defmodule Blog.Serializers.V1.Comment do
-  use Blog.Serializer
+  use JsonApi.Serializer
 
   serialize "comments" do
     attributes [:id, :body]
