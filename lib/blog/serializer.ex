@@ -15,7 +15,7 @@ defmodule Blog.Serializer do
 
   defmacro serialize(key, do: block) do
     quote do
-      import Blog.Serializer, only: [attributes: 1, has_many: 2]
+      import Blog.Serializer, only: [attributes: 1, has_many: 2, belongs_to: 2]
 
       @key unquote(key)
       unquote(block)
@@ -32,6 +32,12 @@ defmodule Blog.Serializer do
   defmacro has_many(name, opts) do
     quote do
       @relations [{:has_many, unquote(name), unquote(opts)} | @relations]
+    end
+  end
+
+  defmacro belongs_to(name, opts) do
+    quote do
+      @relations [{:belongs_to, unquote(name), unquote(opts)} | @relations]
     end
   end
 

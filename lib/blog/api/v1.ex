@@ -5,7 +5,8 @@ defmodule Blog.Api.V1 do
   plug :match
   plug :dispatch
 
-  forward "/posts", to: Blog.Api.V1.Posts
+  forward "/posts",    to: Blog.Api.V1.Posts
+  forward "/comments", to: Blog.Api.V1.Comments
 
   match _ do
     send_resp(conn, 404, "")
