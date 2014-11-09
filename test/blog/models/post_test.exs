@@ -22,6 +22,8 @@ defmodule Blog.Models.PostTest do
 
   test "finding a post", context do
     assert {:ok, post} = Post.create(context[:attrs])
-    assert ^post = Post.find(post.id)
+    found = Post.find(post.id)
+    assert post.id == found.id
+    assert post.title == found.title
   end
 end

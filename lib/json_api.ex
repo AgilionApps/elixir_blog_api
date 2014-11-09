@@ -1,0 +1,3 @@
+defmodule JsonApi do
+
+end

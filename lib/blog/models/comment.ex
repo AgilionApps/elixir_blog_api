@@ -15,8 +15,24 @@ defmodule Blog.Models.Comment do
     body:    present(),
     post_id: present()
 
-  def find(id) do
-    Repo.one(from t in __MODULE__, where: t.id == ^id)
+  def find(ids) when is_list(ids) do
+    Repo.all(from m in __MODULE__, where: m.id in ^ids)
+  end
+
+  def find(id) when is_integer(id) do
+    Repo.one(from m in __MODULE__, where: m.id == ^id)
+  end
+
+  def find(ids) when is_binary(ids) do
+    ids = String.split(ids, ",") |> Enum.map &String.to_integer(&1)
+    case ids do
+      [id] -> find(id)
+      ids  -> find(ids)
+    end
+  end
+
+  def all do
+    Repo.all(from m in __MODULE__, [])
   end
 
   @doc """
