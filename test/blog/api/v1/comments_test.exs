@@ -89,4 +89,31 @@ defmodule Blog.Api.V1.CommentsTest do
     assert ["application/vnd.api+json"] = get_resp_header(response, "content-type")
     assert expected == Poison.decode!(response.resp_body)
   end
+
+  test "POST /v1/comments" do
+    {:ok, post1} = Post.create(%{title: "foo", body: "baz"})
+
+    request = %{
+      "comments" => %{
+        "body"  => "cmnt1",
+        "links" => %{ "post" => post1.id }
+      }
+    }
+
+    headers = [{"content-type", "application/vnd.api+json"}]
+    body = Poison.encode!(request)
+
+    conn = conn("POST", "/v1/comments/", body, headers: headers)
+    response = Blog.Api.call(conn, [])
+    assert 201 = response.status
+
+    json = Poison.decode!(response.resp_body)
+    assert id = json["comments"]["id"]
+    assert is_number(id)
+    assert "cmnt1" = json["comments"]["body"]
+    assert post1.id == json["comments"]["links"]["post"]
+
+    assert ["application/vnd.api+json"] = get_resp_header(response, "content-type")
+    #assert ["http://example.com/v1/comments/#{id}"] == get_resp_header(response, "Location")
+  end
 end

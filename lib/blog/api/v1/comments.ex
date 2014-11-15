@@ -3,6 +3,7 @@ defmodule Blog.Api.V1.Comments do
   alias Blog.Models.Comment
 
   serializer Blog.Serializers.V1.Comment
+  error_serializer Blog.Serializers.V1.Error
 
   get "/" do
     okay(conn, Comment.all)
@@ -10,8 +11,18 @@ defmodule Blog.Api.V1.Comments do
 
   get "/:ids" do
     case Comment.find(ids) do
-      nil   -> not_found(conn)
-      posts -> okay(conn, posts)
+      nil      -> not_found(conn)
+      comments -> okay(conn, comments)
+    end
+  end
+
+  @post_params {"comments", [:title, :body, {:post_id, "links.post"}]}
+
+  post "/" do
+    params = filter_params(conn, @post_params)
+    case Comment.create(params) do
+      {:ok,    comment} -> created(conn, comment)
+      {:error, errors}  -> invalid(conn, errors)
     end
   end
 end
