@@ -9,14 +9,14 @@ defmodule JsonApi.Responders do
   end
 
   defmacro send_json(conn, status, model) do
-    quote do
-      JsonApi.Responders.send_json(unquote(conn), unquote(status), unquote(model), @serializer)
+    quote bind_quoted: [conn: conn, status: status,  model: model] do
+      JsonApi.Responders.send_json(conn, status, model, @serializer)
     end
   end
 
   defmacro okay(conn, model) do
-    quote do
-      JsonApi.Responders.send_json(unquote(conn), 200, unquote(model), @serializer)
+    quote bind_quoted: [conn: conn, model: model] do
+      JsonApi.Responders.send_json(conn, 200, model, @serializer)
     end
   end
 
@@ -25,16 +25,17 @@ defmodule JsonApi.Responders do
   end
 
   defmacro created(conn, model) do
-    quote do
-      unquote(conn)
-        |> Plug.Conn.put_resp_header("Location", "tbd")
-        |> JsonApi.Responders.send_json(201, unquote(model), @serializer)
+    quote bind_quoted: [conn: conn, model: model] do
+      location = apply(@serializer, :location, [model])
+      conn
+        |> Plug.Conn.put_resp_header("Location", location)
+        |> JsonApi.Responders.send_json(201, model, @serializer)
     end
   end
 
   defmacro invalid(conn, errors) do
-    quote do
-      JsonApi.Responders.send_json(unquote(conn), 422, unquote(errors), @error_serializer)
+    quote bind_quoted: [conn: conn, errors: errors] do
+      JsonApi.Responders.send_json(conn, 422, errors, @error_serializer)
     end
   end
 

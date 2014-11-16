@@ -114,6 +114,6 @@ defmodule Blog.Api.V1.CommentsTest do
     assert post1.id == json["comments"]["links"]["post"]
 
     assert ["application/vnd.api+json"] = get_resp_header(response, "content-type")
-    #assert ["http://example.com/v1/comments/#{id}"] == get_resp_header(response, "Location")
+    assert ["http://example.com/v1/comments/#{id}"] == get_resp_header(response, "Location")
   end
 end

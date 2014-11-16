@@ -1,5 +1,7 @@
 defmodule JsonApi.Serializer do
 
+  #TODO: break into relevant modules.
+
   @doc false
   defmacro __using__(_) do
     quote do
@@ -8,8 +10,9 @@ defmodule JsonApi.Serializer do
       @attributes []
       @relations []
       @key nil
+      @location nil
 
-      import JsonApi.Serializer, only: [serialize: 2]
+      import JsonApi.Serializer, only: [serialize: 2, path: 1]
 
       # Rune before compile hook before compiling
       @before_compile JsonApi.Serializer
@@ -33,14 +36,20 @@ defmodule JsonApi.Serializer do
   end
 
   defmacro has_many(name, opts) do
-    quote do
-      @relations [{:has_many, unquote(name), unquote(opts)} | @relations]
+    quote bind_quoted: [name: name, opts: opts] do
+      @relations [{:has_many, name, opts} | @relations]
     end
   end
 
   defmacro belongs_to(name, opts) do
+    quote bind_quoted: [name: name, opts: opts] do
+      @relations [{:belongs_to, name, opts} | @relations]
+    end
+  end
+
+  defmacro path(path) do
     quote do
-      @relations [{:belongs_to, unquote(name), unquote(opts)} | @relations]
+      @location unquote(path)
     end
   end
 
@@ -55,6 +64,10 @@ defmodule JsonApi.Serializer do
 
       def as_json(model) do
         JsonApi.Serializer.normalize(model, __MODULE__, @key, @attributes, @relations)
+      end
+
+      def location(model) do
+        JsonApi.Serializer.do_location(model, @location)
       end
     end
   end
@@ -86,4 +99,17 @@ defmodule JsonApi.Serializer do
       Map.put(results, name, relation_value)
     end
   end
+
+  def do_location(model, path) do
+    {:ok, root_url} = Application.fetch_env(:json_api, :root_url)
+    path = String.split(path, "/")
+      |> Enum.map_join "/", &convert_location_path(&1, model)
+    root_url <> path
+  end
+
+  def convert_location_path(":" <> frag, model) do
+    "#{Map.get(model, String.to_atom(frag))}"
+  end
+
+  def convert_location_path(frag, _model), do: frag
 end
