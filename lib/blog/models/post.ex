@@ -35,7 +35,7 @@ defmodule Blog.Models.Post do
     }
 
     case validate(model) do
-      []     -> {:ok,    Repo.insert(model)}
+      []     -> {:ok,    Repo.insert(model).id |> find}
       errors -> {:error, errors}
     end
   end

@@ -77,4 +77,29 @@ defmodule Blog.Api.V1.PostsTest do
     response = Blog.Api.call(conn, [])
     assert 404 = response.status
   end
+
+  test "POST /v1/posts" do
+    request = %{
+      "posts" => %{
+        "title" => "foo",
+        "body"  => "bar"
+      }
+    }
+
+    headers = [{"content-type", "application/vnd.api+json"}]
+    body = Poison.encode!(request)
+
+    conn = conn("POST", "/v1/posts/", body, headers: headers)
+    response = Blog.Api.call(conn, [])
+    assert 201 = response.status
+
+    json = Poison.decode!(response.resp_body)
+    id = json["posts"]["id"]
+    assert is_number(id)
+    assert "foo" == json["posts"]["title"]
+    assert "bar" == json["posts"]["body"]
+
+    assert ["application/vnd.api+json"] = get_resp_header(response, "content-type")
+    assert ["http://example.com/v1/posts/#{id}"] == get_resp_header(response, "Location")
+  end
 end

@@ -16,7 +16,7 @@ defmodule Blog.Api.V1.Comments do
     end
   end
 
-  @post_params {"comments", [:title, :body, {:post_id, "links.post"}]}
+  @post_params {"comments", [:body, {:post_id, "links.post"}]}
 
   post "/" do
     params = filter_params(conn, @post_params)
