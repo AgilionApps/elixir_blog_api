@@ -52,9 +52,10 @@ defmodule JsonApi.Serializer do
       def __relations,  do: @relations
       def __location,   do: @location
 
-      #TODO: Should adapter encoding happen here?
       def as_json(model) do
-        JsonApi.Serializer.AbstractFormat.generate(model, __MODULE__)
+        model
+          |> JsonApi.Serializer.AbstractFormat.generate(__MODULE__)
+          |> JsonApi.Encoder.encode
       end
 
       def location(model) do
