@@ -21,8 +21,12 @@ defmodule Blog.Models.Post do
     Repo.all(from m in __MODULE__, preload: [:comments])
   end
 
-  def find(id) do
+  def find(id) when is_integer(id) do
     Repo.one(from m in __MODULE__, where: m.id == ^id, preload: [:comments])
+  end
+
+  def find(id) when is_binary(id) do
+    id |> String.to_integer |> find
   end
 
   @doc """
