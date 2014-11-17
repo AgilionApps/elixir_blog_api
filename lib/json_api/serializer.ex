@@ -1,5 +1,7 @@
 defmodule JsonApi.Serializer do
 
+  #TODO: break into relevant modules.
+
   @doc false
   defmacro __using__(_) do
     quote do
@@ -10,6 +12,7 @@ defmodule JsonApi.Serializer do
       @key nil
 
       import JsonApi.Serializer, only: [serialize: 2]
+      import JsonApi.Serializer.Location, only: [path: 1]
 
       # Rune before compile hook before compiling
       @before_compile JsonApi.Serializer
@@ -33,14 +36,14 @@ defmodule JsonApi.Serializer do
   end
 
   defmacro has_many(name, opts) do
-    quote do
-      @relations [{:has_many, unquote(name), unquote(opts)} | @relations]
+    quote bind_quoted: [name: name, opts: opts] do
+      @relations [{:has_many, name, opts} | @relations]
     end
   end
 
   defmacro belongs_to(name, opts) do
-    quote do
-      @relations [{:belongs_to, unquote(name), unquote(opts)} | @relations]
+    quote bind_quoted: [name: name, opts: opts] do
+      @relations [{:belongs_to, name, opts} | @relations]
     end
   end
 
@@ -55,6 +58,10 @@ defmodule JsonApi.Serializer do
 
       def as_json(model) do
         JsonApi.Serializer.normalize(model, __MODULE__, @key, @attributes, @relations)
+      end
+
+      def location(model) do
+        JsonApi.Serializer.Location.generate(model, @location)
       end
     end
   end

@@ -1,7 +1,7 @@
-defmodule Blog.Adapters.JsonApi do
+defmodule JsonApi.Encoder do
   require Inflex
 
-  def adapt(models) do
+  def encode(models) do
     models
       |> format_models
       |> reorder_models

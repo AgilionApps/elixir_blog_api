@@ -1,6 +1,8 @@
 defmodule Blog.Serializers.V1.Post do
   use JsonApi.Serializer
 
+  path "/v1/posts/:id"
+
   serialize "posts" do
     attributes [:id, :title, :body, :is_published]
     has_many :comments, ids: true
