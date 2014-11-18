@@ -42,7 +42,6 @@ defmodule JsonApi.Responders do
   def send_json(conn, status, model, serializer) do
     json = model
       |> serializer.as_json
-      |> JsonApi.Encoder.encode
       |> Poison.Encoder.encode([])
     conn
       |> Plug.Conn.put_resp_header("content-type", "application/vnd.api+json")

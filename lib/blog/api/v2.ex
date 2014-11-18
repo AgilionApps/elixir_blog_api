@@ -1,12 +1,11 @@
-defmodule Blog.Api do
+defmodule Blog.Api.V2 do
   import Plug.Conn
   use Plug.Router
 
   plug :match
   plug :dispatch
 
-  forward "/v1", to: Blog.Api.V1
-  forward "/v2", to: Blog.Api.V2
+  forward "/posts",    to: Blog.Api.V2.Posts
 
   match _ do
     send_resp(conn, 404, "")
