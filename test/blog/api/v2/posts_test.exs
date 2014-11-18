@@ -34,12 +34,14 @@ defmodule Blog.Api.V2.PostsTest do
           }
         },
       ],
-      "comments" => [
-        %{"id" => cmnt1.id, "body" => "cmnt1", "links" => %{"post" => post1.id}},
-        %{"id" => cmnt2.id, "body" => "cmnt2", "links" => %{"post" => post1.id}},
-        %{"id" => cmnt3.id, "body" => "cmnt3", "links" => %{"post" => post2.id}},
-        %{"id" => cmnt4.id, "body" => "cmnt4", "links" => %{"post" => post2.id}}
-      ]
+      "linked" => %{
+        "comments" => [
+          %{"id" => cmnt2.id, "body" => "cmnt2", "links" => %{"post" => post1.id}},
+          %{"id" => cmnt1.id, "body" => "cmnt1", "links" => %{"post" => post1.id}},
+          %{"id" => cmnt4.id, "body" => "cmnt4", "links" => %{"post" => post2.id}},
+          %{"id" => cmnt3.id, "body" => "cmnt3", "links" => %{"post" => post2.id}}
+        ]
+      }
     }
 
     conn = conn("GET", "/v2/posts", nil, [])
@@ -70,10 +72,12 @@ defmodule Blog.Api.V2.PostsTest do
           "comments" => [cmnt1.id, cmnt2.id]
         }
       },
-      "comments" => [
-        %{"id" => cmnt1.id, "body" => "cmnt1", "links" => %{"post" => post1.id}},
-        %{"id" => cmnt2.id, "body" => "cmnt2", "links" => %{"post" => post1.id}},
-      ]
+      "linked" => %{
+        "comments" => [
+          %{"id" => cmnt2.id, "body" => "cmnt2", "links" => %{"post" => post1.id}},
+          %{"id" => cmnt1.id, "body" => "cmnt1", "links" => %{"post" => post1.id}}
+        ]
+      }
     }
 
     assert 200 = response.status

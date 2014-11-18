@@ -1,16 +1,16 @@
 defmodule JsonApi.Serializer.AbstractFormat do
   def generate(models, module) when is_list(models) do
-    Enum.flat_map models, &generate(&1, module)
+    Enum.map models, &generate(&1, module)
   end
 
   def generate(model, module) do
     # TODO: Any benefit to useing a struct here?
-    generated = %{
+   %{
       type:       module.__key,
       attributes: attribute_map(model, module),
-      relations:  nested_relations(model, module)
+      relations:  nested_relations(model, module),
+      linked:     sideloaded_relations(model, module)
     }
-    [ generated | sideloaded_relations(model, module) ]
   end
 
   defp attribute_map(model, module) do

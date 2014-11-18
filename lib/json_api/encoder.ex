@@ -1,36 +1,44 @@
 defmodule JsonApi.Encoder do
   require Inflex
 
-  def encode(models) do
-    models
-      |> format_models
-      |> reorder_models
+  def encode(models) when is_list(models) do
+    [f | _] = models
+    %{}
+      |> Map.put(f.type, Enum.map(models, &format(&1)))
+      |> put_linked(models)
       |> camelize_keys
   end
 
-  def format_models(models) do
-    Enum.reduce models, %{}, &_format_models(&1, &2)
+  def encode(model) when is_map(model) do
+    %{}
+      |> Map.put(model.type, format(model))
+      |> put_linked([model])
+      |> camelize_keys
   end
 
-  defp _format_models(%{type: type} = model, results) do
-    model = format(model)
-    Map.update(results, type, [model], &[model | &1])
+  defp put_linked(results, models) do
+    case extract_linked(models) do
+      []     -> results
+      linked -> Map.put(results, "linked", group_and_format(linked))
+    end
   end
 
-  def format(model) do
+  defp extract_linked(models), do: extract_linked(models, [])
+  defp extract_linked([], results), do: results
+  defp extract_linked([model | models], results) do
+    nested_linked = extract_linked(model.linked)
+    extract_linked(models, nested_linked ++ model.linked ++ results)
+  end
+
+  defp group_and_format(models) do
+    Enum.reduce models, %{}, fn(%{type: type} = model, results) ->
+      model = format(model)
+      Map.update(results, type, [model], &[model | &1])
+    end
+  end
+
+  defp format(model) do
     Map.put(model[:attributes], :links, model[:relations])
-  end
-
-  def reorder_models(models) do
-    Enum.reduce models, %{}, &_reorder_models(&1, &2)
-  end
-
-  defp _reorder_models({type, [model]}, results) do
-    Map.put(results, type, model)
-  end
-
-  defp _reorder_models({type, models}, results) do
-    Map.put(results, type, Enum.reverse(models))
   end
 
   defp camelize_keys(map) when is_map(map) do
@@ -45,7 +53,6 @@ defmodule JsonApi.Encoder do
 
   defp camelize_keys(other), do: other
 
-  defp camelize(word) when is_atom(word),   do: Inflex.camelize(word, :lower)
-  defp camelize(word) when is_binary(word), do: Inflex.camelize(word, :lower)
+  defp camelize(word), do: Inflex.camelize(word, :lower)
 end
 
