@@ -27,7 +27,7 @@ defmodule JsonApi.Serializer.AbstractFormat do
   defp nested_relations(model, module) do
     Enum.reduce module.__relations, %{}, fn({type, name, opts}, results) ->
       relation_value = if opts[:link] do
-        nil
+        %{href: JsonApi.Serializer.Location.generate(model, opts[:link])}
       else
         nested_ids(model, module, {type, name, opts})
       end

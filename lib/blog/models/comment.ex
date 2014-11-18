@@ -35,6 +35,14 @@ defmodule Blog.Models.Comment do
     Repo.all(from m in __MODULE__, [])
   end
 
+  def for_post(post_id) when is_binary(post_id) do
+    post_id |> String.to_integer |> for_post
+  end
+
+  def for_post(post_id) do
+    Repo.all(from m in __MODULE__, where: m.post_id == ^post_id)
+  end
+
   @doc """
   Validates and creates a comment given a map of attributes
   """
