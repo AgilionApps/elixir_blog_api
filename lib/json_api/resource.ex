@@ -1,4 +1,4 @@
-defmodule JsonApi.Router do
+defmodule JsonApi.Resource do
   @moduledoc """
    TODO: Doc this.
 
@@ -16,7 +16,7 @@ defmodule JsonApi.Router do
 
       @serializer nil
       @error_serializer nil
-      import JsonApi.Router, only: [serializer: 1, error_serializer: 1]
+      import JsonApi.Resource, only: [serializer: 1, error_serializer: 1]
     end
   end
 

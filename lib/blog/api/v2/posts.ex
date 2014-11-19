@@ -1,5 +1,5 @@
 defmodule Blog.Api.V2.Posts do
-  use JsonApi.Router
+  use JsonApi.Resource
   alias Blog.Models.Post
 
   serializer Blog.Serializers.V2.Post

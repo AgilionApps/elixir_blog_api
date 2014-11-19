@@ -1,5 +1,5 @@
 defmodule Blog.Api.V3.Comments do
-  use JsonApi.Router
+  use JsonApi.Resource
   alias Blog.Models.Comment
 
   serializer Blog.Serializers.V2.Comment
