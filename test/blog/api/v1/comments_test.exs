@@ -58,15 +58,13 @@ defmodule Blog.Api.V1.CommentsTest do
       ]
     }
 
-    IO.puts "Skipping GET /v1/comments/1,2 pending where IN query solution"
-    # conn = conn("GET", "/v1/comments/#{cmnt1.id},#{cmnt3.id}", nil, [])
+    conn = conn("GET", "/v1/comments/#{cmnt1.id},#{cmnt3.id}", nil, [])
 
-    # response = Blog.Api.call(conn, [])
+    response = Blog.Api.call(conn, [])
 
-    # assert 200 = response.status
-    # assert ["application/vnd.api+json"] = get_resp_header(response, "content-type")
-    # assert expected == Poison.decode!(response.resp_body)
-
+    assert 200 = response.status
+    assert ["application/vnd.api+json"] = get_resp_header(response, "content-type")
+    assert expected == Poison.decode!(response.resp_body)
   end
 
   test "GET /v1/comments/:id" do
@@ -108,7 +106,7 @@ defmodule Blog.Api.V1.CommentsTest do
     assert 201 = response.status
 
     json = Poison.decode!(response.resp_body)
-    assert id = json["comments"]["id"]
+    id = json["comments"]["id"]
     assert is_number(id)
     assert "cmnt1" = json["comments"]["body"]
     assert post1.id == json["comments"]["links"]["post"]

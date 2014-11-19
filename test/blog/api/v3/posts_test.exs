@@ -3,7 +3,6 @@ defmodule Blog.Api.V3.PostsTest do
   use Plug.Test
 
   alias Blog.Models.Post
-  alias Blog.Models.Comment
 
   test "GET /v2/posts" do
     {:ok, post1} = Post.create(%{title: "foo", body: "baz"})

@@ -16,7 +16,7 @@ defmodule Blog.Models.Comment do
     post_id: present()
 
   def find(ids) when is_list(ids) do
-    Repo.all(from m in __MODULE__, where: m.id in ^ids)
+    Repo.all(from m in __MODULE__, where: m.id in array(^ids, :integer))
   end
 
   def find(id) when is_integer(id) do
