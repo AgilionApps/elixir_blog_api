@@ -52,9 +52,9 @@ defmodule JsonApi.Serializer do
       def __relations,  do: @relations
       def __location,   do: @location
 
-      def as_json(model) do
+      def as_json(model, conn) do
         model
-          |> JsonApi.Serializer.AbstractFormat.generate(__MODULE__)
+          |> JsonApi.Serializer.AbstractFormat.generate(__MODULE__, conn)
           |> JsonApi.Encoder.encode
       end
 

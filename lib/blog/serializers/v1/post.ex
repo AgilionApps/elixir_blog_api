@@ -8,11 +8,11 @@ defmodule Blog.Serializers.V1.Post do
     has_many :comments, ids: true
   end
 
-  def is_published(post) do
+  def is_published(post, _conn) do
     post.posted_at != nil
   end
 
-  def comments(post) do
+  def comments(post, _conn) do
     Enum.map post.comments.all, &(&1.id)
   end
 end

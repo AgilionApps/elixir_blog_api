@@ -8,7 +8,7 @@ defmodule Blog.Serializers.V2.Post do
     has_many :comments, serializer: Blog.Serializers.V2.Comment
   end
 
-  def is_published(post), do: post.posted_at != nil
+  def is_published(post, _conn), do: post.posted_at != nil
 
-  def comments(post), do: post.comments.all
+  def comments(post, _conn), do: post.comments.all
 end

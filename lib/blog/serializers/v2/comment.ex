@@ -8,5 +8,5 @@ defmodule Blog.Serializers.V2.Comment do
     belongs_to :post, ids: true
   end
 
-  def post(model), do: model.post_id
+  def post(model, _conn), do: model.post_id
 end

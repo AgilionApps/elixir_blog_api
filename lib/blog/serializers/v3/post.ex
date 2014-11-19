@@ -8,7 +8,7 @@ defmodule Blog.Serializers.V3.Post do
     has_many :comments, link: "/v3/posts/:id/comments"
   end
 
-  def is_published(post) do
+  def is_published(post, _conn) do
     post.posted_at != nil
   end
 end
