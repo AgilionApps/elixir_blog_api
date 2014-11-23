@@ -12,8 +12,8 @@ defmodule Blog.Api do
   end
 
   version :v3 do
-    resource :posts,      Blog.Api.V1.Posts do
-      resource :comments, Blog.Api.V1.Comments
+    resource :posts,      Blog.Api.V3.Posts do
+      resource :comments, Blog.Api.V3.Comments
     end
   end
 

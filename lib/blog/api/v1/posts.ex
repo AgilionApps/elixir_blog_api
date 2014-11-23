@@ -1,13 +1,9 @@
 defmodule Blog.Api.V1.Posts do
-  use Plug.Router
-  use JsonApi.Responders
-  use JsonApi.Params
+  use JsonApi.Resource
+  alias Blog.Models.Post
 
-  plug Plug.Parsers, parsers: [JsonApi.PlugParser]
   plug :match
   plug :dispatch
-
-  alias Blog.Models.Post
 
   serializer Blog.Serializers.V1.Post
   error_serializer Blog.Serializers.V1.Error
@@ -16,14 +12,14 @@ defmodule Blog.Api.V1.Posts do
     okay(conn, Post.all)
   end
 
-  get "/" do
-    okay(conn, Post.all)
+  def find_many(conn, ids) do
+    okay(conn, Post.find(ids))
   end
 
-  get ":id" do
-    case Post.find(String.to_integer(id)) do
-      nil  -> not_found(conn)
-      post -> okay(conn, post)
+  def find_one(conn, id) do
+    case Post.find(id) do
+      nil     -> not_found(conn)
+      comment -> okay(conn, comment)
     end
   end
 

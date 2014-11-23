@@ -15,10 +15,8 @@ defmodule JsonApi.Resource do
 
       plug Plug.Parsers, parsers: [JsonApi.PlugParser]
 
-
-      # what do we match on here?
       get "/" do
-        find_all(var!(conn))
+        find_all(JsonApi.Resource.set_parent(var!(conn)))
       end
 
       get "/:id_or_ids" do
@@ -32,6 +30,14 @@ defmodule JsonApi.Resource do
         end
       end
 
+    end
+  end
+
+  def set_parent(conn) do
+    case {conn.private[:relax_parent_name], conn.private[:relax_parent_id]} do
+      {nil, _}   -> conn
+      {_, nil}   -> conn
+      {name, id} -> Map.update(conn, :params, %{}, &(Map.put(&1, name, id)))
     end
   end
 end
