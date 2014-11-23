@@ -1,5 +1,11 @@
 defmodule Blog.Api.V3.Comments do
-  use JsonApi.Resource
+  use Plug.Router
+  use JsonApi.Responders
+  use JsonApi.Params
+
+  plug Plug.Parsers, parsers: [JsonApi.PlugParser]
+  plug :match
+  plug :dispatch
   alias Blog.Models.Comment
 
   serializer Blog.Serializers.V2.Comment

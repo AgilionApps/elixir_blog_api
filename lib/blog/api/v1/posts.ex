@@ -1,9 +1,20 @@
 defmodule Blog.Api.V1.Posts do
-  use JsonApi.Resource
+  use Plug.Router
+  use JsonApi.Responders
+  use JsonApi.Params
+
+  plug Plug.Parsers, parsers: [JsonApi.PlugParser]
+  plug :match
+  plug :dispatch
+
   alias Blog.Models.Post
 
   serializer Blog.Serializers.V1.Post
   error_serializer Blog.Serializers.V1.Error
+
+  def find_all(conn) do
+    okay(conn, Post.all)
+  end
 
   get "/" do
     okay(conn, Post.all)

@@ -5,6 +5,7 @@ defmodule Blog.Api.V1.CommentsTest do
   alias Blog.Models.Post
   alias Blog.Models.Comment
 
+  @tag :wip
   test "GET /v1/comments" do
     {:ok, post1} = Post.create(%{title: "foo", body: "baz"})
     {:ok, post2} = Post.create(%{title: "fu",  body: "bar"})

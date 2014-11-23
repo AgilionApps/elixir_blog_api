@@ -1,5 +1,12 @@
 defmodule Blog.Api.V3.Posts do
-  use JsonApi.Resource
+  use Plug.Router
+  use JsonApi.Responders
+  use JsonApi.Params
+
+  plug Plug.Parsers, parsers: [JsonApi.PlugParser]
+  plug :match
+  plug :dispatch
+
   alias Blog.Models.Post
 
   serializer Blog.Serializers.V3.Post
