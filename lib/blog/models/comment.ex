@@ -15,8 +15,16 @@ defmodule Blog.Models.Comment do
     body:    present(),
     post_id: present()
 
+  def find([id | _] = ids) when is_binary(id) do
+    ids |> Enum.map(&String.to_integer(&1)) |> find
+  end
+
   def find(ids) when is_list(ids) do
     Repo.all(from m in __MODULE__, where: m.id in array(^ids, :integer))
+  end
+
+  def find(id) when is_binary(id) do
+    id |> String.to_integer |> find
   end
 
   def find(id) do

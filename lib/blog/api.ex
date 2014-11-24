@@ -4,6 +4,7 @@ defmodule Blog.Api do
   plug :match
   plug :dispatch
 
+  # Standard plug forwarding and match still work.
   forward "/v2", to: Blog.Api.V2
 
   version :v1 do
@@ -12,9 +13,14 @@ defmodule Blog.Api do
   end
 
   version :v3 do
-    resource :posts,      Blog.Api.V3.Posts do
-      resource :comments, Blog.Api.V3.Comments
+    resource :posts, Blog.Api.V3.Posts do
+      resource :comments, Blog.Api.V3.Post.Comments
     end
+    resource :comments, Blog.Api.V3.Comments
+  end
+
+  match "status" do
+    Plug.Conn.send_resp(conn, 200, "Alive")
   end
 
   match _ do

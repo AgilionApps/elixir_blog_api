@@ -1,5 +1,5 @@
 defmodule Blog.Api.V3.Comments do
-  use JsonApi.Resource
+  use JsonApi.Resource, except: [:create, :update, :delete]
   alias Blog.Models.Comment
 
   plug :match
@@ -9,10 +9,7 @@ defmodule Blog.Api.V3.Comments do
   error_serializer Blog.Serializers.V1.Error
 
   def find_all(conn) do
-    case conn.params["posts"] do
-      nil     -> okay(conn, Comment.all)
-      post_id -> okay(conn, Comment.for_post(post_id))
-    end
+    okay(conn, Comment.all)
   end
 
   def find_many(conn, ids) do

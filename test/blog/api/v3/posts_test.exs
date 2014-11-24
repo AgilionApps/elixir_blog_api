@@ -4,7 +4,6 @@ defmodule Blog.Api.V3.PostsTest do
 
   alias Blog.Models.Post
 
-  @tag :wip
   test "GET /v3/posts" do
     {:ok, post1} = Post.create(%{title: "foo", body: "baz"})
     {:ok, post2} = Post.create(%{title: "fu",  body: "bar"})

@@ -1,5 +1,5 @@
 defmodule Blog.Api.V3.Posts do
-  use JsonApi.Resource
+  use JsonApi.Resource, only: [:find_all, :find_many, :find_one]
   alias Blog.Models.Post
 
   plug :match

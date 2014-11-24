@@ -1,5 +1,5 @@
 defmodule Blog.Api.V1.Comments do
-  use JsonApi.Resource
+  use JsonApi.Resource, except: [:update, :delete]
   alias Blog.Models.Comment
 
   plug :match
@@ -25,16 +25,11 @@ defmodule Blog.Api.V1.Comments do
 
   @post_params {"comments", [:body, {:post_id, "links.post"}]}
 
-  post "/" do
+  def create(conn) do
     params = filter_params(conn, @post_params)
     case Comment.create(params) do
       {:ok,    comment} -> created(conn, comment)
       {:error, errors}  -> invalid(conn, errors)
     end
-  end
-
-  match other do
-    IO.inspect(other)
-    conn
   end
 end

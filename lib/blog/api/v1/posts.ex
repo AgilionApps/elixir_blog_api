@@ -1,5 +1,5 @@
 defmodule Blog.Api.V1.Posts do
-  use JsonApi.Resource
+  use JsonApi.Resource, except: [:update, :delete]
   alias Blog.Models.Post
 
   plug :match
@@ -23,16 +23,12 @@ defmodule Blog.Api.V1.Posts do
     end
   end
 
-  post "/" do
+  def create(conn) do
     filter_params(conn, {"posts", [:title, :body]}) do
       case Post.create(params) do
         {:ok,    post}   -> created(conn, post)
         {:error, errors} -> invalid(conn, errors)
       end
     end
-  end
-
-  match _ do
-    not_found(conn)
   end
 end
