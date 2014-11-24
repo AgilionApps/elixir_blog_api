@@ -3,8 +3,6 @@ defmodule JsonApi.Resource do
    TODO: Doc this.
   """
 
-  # All Possible actions
-
   defmacro __using__(opts) do
     quote do
       use Plug.Router
@@ -12,61 +10,25 @@ defmodule JsonApi.Resource do
       use JsonApi.Params
 
       plug Plug.Parsers, parsers: [JsonApi.PlugParser]
+      plug JsonApi.Resource.Nested
 
       opts = unquote(opts)
       @actions [:find_all, :find_many, :find_one, :create, :update, :delete]
-      @allowed_actions (opts[:only] || @actions -- (opts[:except] || []))
+      @allowed (opts[:only] || @actions -- (opts[:except] || []))
 
-      unquote(JsonApi.Resource.generate_routes)
+      unquote(JsonApi.Resource.use_action_behaviours)
     end
   end
 
-  def generate_routes do
+  def use_action_behaviours do
     quote do
-      if (Enum.member?(@allowed_actions, :find_all)) do
-        get "/", do: var!(conn) |> JsonApi.Resource.set_parent |> find_all
+      if Enum.member?(@allowed, :find_all), do: use JsonApi.Resource.FindAll
+      if Enum.member?(@allowed, :create),   do: use JsonApi.Resource.Create
+      if Enum.member?(@allowed, :update),   do: use JsonApi.Resource.Update
+      if Enum.member?(@allowed, :delete),   do: use JsonApi.Resource.Delete
+      if Enum.member?(@allowed, :find_many) || Enum.member?(@allowed, :find_one) do
+        use JsonApi.Resource.FindN
       end
-
-      if Enum.member?(@allowed_actions, :find_one) ||
-          Enum.member?(@allowed_actions, :find_one) do
-        unquote(JsonApi.Resource.find_one_and_many)
-      end
-
-      if (Enum.member?(@allowed_actions, :create)) do
-        post "/", do: var!(conn) |> JsonApi.Resource.set_parent |> create
-      end
-
-      if (Enum.member?(@allowed_actions, :update)) do
-        patch "/:id", do: var!(conn) |> JsonApi.Resource.set_parent |> update
-        put   "/:id", do: var!(conn) |> JsonApi.Resource.set_parent |> update
-        post  "/:id", do: var!(conn) |> JsonApi.Resource.set_parent |> update
-      end
-
-      if (Enum.member?(@allowed_actions, :delete)) do
-        delete "/:id", do: var!(conn) |> JsonApi.Resource.set_parent |> delete
-      end
-    end
-  end
-
-  def find_one_and_many do
-    quote do
-      get "/:id_or_ids" do
-        ids = var!(id_or_ids) |> String.split(",")
-        find_many? = Enum.member?(@allowed_actions, :find_many)
-        find_one? = Enum.member?(@allowed_actions, :find_one)
-        case {find_many?, find_one?, ids} do
-          {_, true, [id]} -> find_one(var!(conn), id)
-          {true, _, ids}  -> find_many(var!(conn), ids)
-        end
-      end
-    end
-  end
-
-  def set_parent(conn) do
-    case {conn.private[:relax_parent_name], conn.private[:relax_parent_id]} do
-      {nil, _}   -> conn
-      {_, nil}   -> conn
-      {name, id} -> Map.update(conn, :params, %{}, &(Map.put(&1, name, id)))
     end
   end
 end
