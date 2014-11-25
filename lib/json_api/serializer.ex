@@ -1,6 +1,37 @@
 defmodule JsonApi.Serializer do
   @moduledoc """
-  TODO: Doc this well.
+  A DSL to define how a map or struct is serialized.
+
+  Provides a set of macros to define what to serialize. For example:
+
+      defmodule PostSerializer do
+        use Relax.Serializer
+
+        path "/v1/posts/:id"
+
+        serialize "posts" do
+          attributes [:id, :title, :body, :is_published]
+          has_many :comments,    ids: true
+          has_many :my_comments, link: "/v1/posts/:id/my_comments"
+        end
+
+        def is_published(post, _conn) do
+          post.posted_at != nil
+        end
+
+        def comments(post, _conn) do
+          Comments.by_post(post) |> Enum.map(&Map.get(&1, :id))
+        end
+      end
+
+  A map or struct can then be passed to the serializer to return a the map now
+  in the JsonApi.org format.
+
+      post = %{id: 1, title: "Elixir is Sake", body: "yum", is_published: nil}
+      PostSerializer.as_json(post, conn)
+
+  This can then be passed to your JSON encoder of choice for encoding to a
+  binary.
   """
 
   @doc false
@@ -17,6 +48,9 @@ defmodule JsonApi.Serializer do
     end
   end
 
+  @doc """
+  Main API to define a serializer.
+  """
   defmacro serialize(key, do: block) do
     quote do
       import JsonApi.Serializer, only: [
