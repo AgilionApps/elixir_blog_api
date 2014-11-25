@@ -1,16 +1,20 @@
 # Relax
 
-A JsonAPI.org implimentation in Elixir.
+A [jsonapi.org](http://jsonapi.org) server implimentation in Elixir.
 
-## Rational
+## Rationale
 
-TLDR: Generate a proper JsonAPI.org server as simply as possible.
+### Adoption
 
-In order to drive Elixir adoption in my day to day work (Agilion.com) the absolute first thing needed is an easy way to build JSON Rest APIs suitable for comsumption by Ember.js. While this is certainly acheivable with existing Elixir tooling (like the powerful Pheonix Framework), I was looking for something that gave me exactly what was needed and nothing that wasn't.
+To drive Elixir adoption at my work place by making the simple use case of building Restful jsonapi.org servers painless and easy. After it is already in the door the more challenging problems will get tackled.
 
-In particular generating the proper JsonAPI.org format with as little ceremony as possible, including handling all the content type, url routing, JSON structure, and various relationship options.
+### Simplicity
 
-Further, the serialization DSL is inflenced heavily by ActiveModel::Serializers.
+Powerful, full featured frameworks like Pheonix provide tons of functionality and value, but simple APIs call for simple tools.
+
+### Standard
+
+JSON APIs are notoriously inconsistent. By adopting the [jsonapi.org](http://jsonapi.org) spec much bikeshedding can be avoided and APIs can be built to spec.
 
 ## Installation
 
@@ -77,7 +81,7 @@ conn
 
 ### Response helpers
 
-This layer lets you quickly abstract calling serializers and sending responses.
+These helpers lets you quickly abstract calling serializers and sending responses.
 
 
 ```elixir
@@ -129,27 +133,45 @@ end
 
 This is the final layer, and wraps those above. It provides a Router and a Resource.
 
-A Router is a extremely simple plug router inspired by and based on the fantastic work by Chris McCord in Pheonix, but focused on Restful APIs implementing the jsonapi.org spec. Namely providing an easy interface for dealing with versioning and the various GET calls.
+A Router is a thin layer on top of the existing Plug.Router implementation. It provides version and resource macros to let you quickly define resources.
+
+You can still use `Plug.Route.forward/2` and `Plug.Route.match/2` as well as hook into the plug stack normally.
 
 ```elixir
-defmodule Router do
+defmodule MyApp.Router do
   use Relaxir.Router
 
+  plug :match
+  plug :dispatch
+
+  forward "/app", to: MyApp.Static
+
   version :v1 do
-    resource :posts, API.V1.Posts, except: [:create, :update] do
-      resource :comments, API.V1.Comments, only: [:find_all]
+    resource :posts, MyApp.API.V1.Posts do
+      resource :comments, MyApp.API.V1.Posts.Comments
     end
-    resource :comments, API.V1.Comments, except: [:find_all]
+    resource :comments, MyApp.API.V1.Comments
+  end
+
+  match _ do
+    Plug.Conn.send_resp(conn, 404, "")
   end
 end
 ```
 
-A resource includes all our response and params helpers in a tidy api.
+A Relax.Resource includes all our response and params helpers in a tidy api.
+
+A Relax.Resource expects some or all of `find_all/1', `find_many/2`, `find_one/2`, `create/1`, `update/2`, and `delete/2` to be defined. Adding the `:only` or `:except` options to the use Relaxir.Resource will limit which matches are defined.
+
+Once again, normal Plug.Route plug stack, functions, and matching work, however they will be defined after the pre-generated resource matches.
 
 ```elixir
 
 defmodule API.V1.Posts do
-  use Relaxir.Resource
+  use Relaxir.Resource, only: [:find_all, :find_one, :find_many]
+
+  plug :match
+  plug :dispatch
 
   serializer Serializers.V1.Post
 
@@ -167,7 +189,18 @@ defmodule API.V1.Posts do
   def find_many(conn, list_of_ids) do
     okay(conn, Post.find(list_of_ids))
   end
+
+  def match(_), do: not_found(conn)
 end
 
 ```
 
+## Credits
+
+The design of Plug, Pheonix, and Ecto all influenced this library.
+
+Additionally, the serialization DSL is inflenced heavily by ActiveModel::Serializers.
+
+## License
+
+TODO: release & license.
