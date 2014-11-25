@@ -1,36 +1,34 @@
 defmodule JsonApi.Resource do
   @moduledoc """
    TODO: Doc this.
-
   """
 
-  defmacro __using__(_) do
+  defmacro __using__(opts) do
     quote do
       use Plug.Router
       use JsonApi.Responders
       use JsonApi.Params
 
       plug Plug.Parsers, parsers: [JsonApi.PlugParser]
-      plug :match
-      plug :dispatch
+      plug JsonApi.Resource.Nested
 
-      @serializer nil
-      @error_serializer nil
-      import JsonApi.Resource, only: [serializer: 1, error_serializer: 1]
+      opts = unquote(opts)
+      @actions [:find_all, :find_many, :find_one, :create, :update, :delete]
+      @allowed (opts[:only] || @actions -- (opts[:except] || []))
+
+      unquote(JsonApi.Resource.use_action_behaviours)
     end
   end
 
-  @doc """
-  Defines the serializer this router will use to serialize json.
-  """
-  defmacro serializer(module) do
-    quote do: @serializer unquote(module)
-  end
-
-  @doc """
-  Defines a serializer to be used by invalid responders
-  """
-  defmacro error_serializer(module) do
-    quote do: @error_serializer unquote(module)
+  def use_action_behaviours do
+    quote do
+      if Enum.member?(@allowed, :find_all), do: use JsonApi.Resource.FindAll
+      if Enum.member?(@allowed, :create),   do: use JsonApi.Resource.Create
+      if Enum.member?(@allowed, :update),   do: use JsonApi.Resource.Update
+      if Enum.member?(@allowed, :delete),   do: use JsonApi.Resource.Delete
+      if Enum.member?(@allowed, :find_many) || Enum.member?(@allowed, :find_one) do
+        use JsonApi.Resource.FindN
+      end
+    end
   end
 end

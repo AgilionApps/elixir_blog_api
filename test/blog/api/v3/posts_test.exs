@@ -4,7 +4,7 @@ defmodule Blog.Api.V3.PostsTest do
 
   alias Blog.Models.Post
 
-  test "GET /v2/posts" do
+  test "GET /v3/posts" do
     {:ok, post1} = Post.create(%{title: "foo", body: "baz"})
     {:ok, post2} = Post.create(%{title: "fu",  body: "bar"})
 

@@ -5,6 +5,7 @@ defmodule JsonApi.Encoder do
     [f | _] = models
     %{}
       |> Map.put(f.type, Enum.map(models, &format(&1)))
+      |> put_meta(f)
       |> put_linked(models)
       |> camelize_keys
   end
@@ -12,8 +13,17 @@ defmodule JsonApi.Encoder do
   def encode(model) when is_map(model) do
     %{}
       |> Map.put(model.type, format(model))
+      |> put_meta(model)
       |> put_linked([model])
       |> camelize_keys
+  end
+
+  defp put_meta(results, model) do
+    case Map.get(model, :meta) do
+      nil  -> results
+      %{}  -> results
+      meta -> Map.put(results, "meta", meta)
+    end
   end
 
   defp put_linked(results, models) do
