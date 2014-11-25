@@ -63,7 +63,16 @@ defmodule JsonApi.Serializer do
   end
 
   defmacro attributes(atts) do
-    quote do: @attributes @attributes ++ unquote(atts)
+    quote bind_quoted: [atts: atts] do
+      # Save attributes
+      @attributes @attributes ++ atts
+
+      # Define default attribute function, make overridable
+      for att <- atts do
+        def unquote(att)(model, _conn), do: Map.get(model, unquote(att))
+        defoverridable [{att, 2}]
+      end
+    end
   end
 
   defmacro has_many(name, opts) do

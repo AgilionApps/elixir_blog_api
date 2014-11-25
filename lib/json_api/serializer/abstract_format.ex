@@ -16,10 +16,7 @@ defmodule JsonApi.Serializer.AbstractFormat do
 
   defp attribute_map(model, module, conn) do
     Enum.reduce module.__attributes, %{}, fn(attr, results) ->
-      case Map.fetch(model, attr) do
-        {:ok, val} -> Map.put(results, attr, val)
-        :error     -> Map.put(results, attr, apply(module, attr, [model, conn]))
-      end
+      Map.put(results, attr, apply(module, attr, [model, conn]))
     end
   end
 
