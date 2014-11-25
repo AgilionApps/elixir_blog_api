@@ -9,7 +9,7 @@ defmodule Blog.Api.V1.Comments do
   error_serializer Blog.Serializers.V1.Error
 
   def find_all(conn) do
-    okay(conn, Comment.all, %{page: 1, count: 2})
+    okay(conn, Comment.all, %{page: 1, total_pages: 1})
   end
 
   def find_many(conn, ids) do

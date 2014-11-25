@@ -23,7 +23,11 @@ defmodule Blog.Api.V1.CommentsTest do
           "body"  => "cmnt2",
           "links" => %{ "post" => post2.id }
         }
-      ]
+      ],
+      "meta" => %{
+        "page"       => 1,
+        "totalPages" => 1
+      }
     }
 
     conn = conn("GET", "/v1/comments", nil, [])

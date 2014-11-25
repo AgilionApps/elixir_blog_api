@@ -20,9 +20,9 @@ defmodule JsonApi.Encoder do
 
   defp put_meta(results, model) do
     case Map.get(model, :meta) do
-      nil  -> results
-      %{}  -> results
-      meta -> Map.put(results, "meta", meta)
+      nil                          -> results
+      meta when map_size(meta) > 0 -> Map.put(results, "meta", meta)
+      _                            -> results
     end
   end
 
