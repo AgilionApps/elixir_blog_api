@@ -1,4 +1,17 @@
 defmodule JsonApi.Serializer.AbstractFormat do
+
+
+  # Issues to resolve:
+  #  1) no way to hook in caching
+  #  2) possible to have duplicate sideloaded objects <- wasteful
+  #  3) AbstractFormat is a terrible module name.
+  #  4) generate is a terrible function name.
+  #  5) A plugable adapter would be nice.
+  #  X) We should check for defined methods before checking the map, not vice versa.
+  #  7) JsonApi.Encoder is a terrible module name.
+  #  8) The lines between the Format and the Adapter are incredibly vauge.
+
+
   def generate(models, module, conn, meta) when is_list(models) do
     Enum.map models, &generate(&1, module, conn, meta)
   end
@@ -14,6 +27,7 @@ defmodule JsonApi.Serializer.AbstractFormat do
     }
   end
 
+  # :ok in serializer
   defp attribute_map(model, module, conn) do
     Enum.reduce module.__attributes, %{}, fn(attr, results) ->
       Map.put(results, attr, apply(module, attr, [model, conn]))
