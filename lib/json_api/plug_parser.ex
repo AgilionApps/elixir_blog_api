@@ -23,7 +23,7 @@ defmodule JsonApi.PlugParser do
   defp decode({:ok, body, conn}) do
     decoded = body
       |> Poison.decode!
-      |> JsonApi.Decoder.decode
+      |> JsonApi.Formatter.JsonApiOrg.parse
     {:ok, decoded, conn}
   end
 end

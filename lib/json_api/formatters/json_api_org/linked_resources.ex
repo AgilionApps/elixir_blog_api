@@ -17,13 +17,6 @@ defmodule JsonApi.Formatter.JsonApiOrg.LinkedResources do
     end
   end
 
-
-  defp inspect_and_return(any) do
-    IO.inspect any
-    any
-  end
-
-
   # Find all relations, convert to nested data structure
   defp all(%{} = model, serializer, conn), do: all([model], serializer, conn)
   defp all(models, serializer, conn) do

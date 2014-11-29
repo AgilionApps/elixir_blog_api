@@ -11,14 +11,17 @@ defmodule JsonApi.Serializer do
 
         serialize "posts" do
           attributes [:id, :title, :body, :is_published]
-          has_many :comments,    ids: true
-          has_many :my_comments, link: "/v1/posts/:id/my_comments"
+          has_one  :author, field: :author_id, serializer: UserSerializer
+          has_many :comments
+          has_many :flagged_comments, link: "/v1/posts/:id/flagged_comments"
         end
 
         def is_published(post, _conn) do
           post.posted_at != nil
         end
 
+        # Returns list of ids to include.
+        # Overrides default implementation: `Map.get(post, :comments)`
         def comments(post, _conn) do
           Comments.by_post(post) |> Enum.map(&Map.get(&1, :id))
         end
@@ -75,15 +78,43 @@ defmodule JsonApi.Serializer do
     end
   end
 
+  @doc """
+
+  Adds a serialized relationship. By default expects to include a list of ids
+  in the serialized resource. Include the full resource in the output by
+  included a serializer option.
+
+  Override the default by defining a function of relation name with arity of 2.
+
+  ## Opts
+
+  * field - The field to call on the model to get a list of ids. Defaults to
+            the relation name.
+  * serializer - If defined full representation is expected in response. Should
+                 be a module name.
+  * link - Represent this resource as a link to another resource.
+
+  """
   defmacro has_many(name, opts) do
     quote bind_quoted: [name: name, opts: opts] do
       @relations [{:has_many, name, opts} | @relations]
+      # Define default relation function, make overridable
+      def unquote(name)(model, _conn) do
+        Map.get(model, (unquote(opts)[:field] || unquote(name)))
+      end
+      defoverridable [{name, 2}]
     end
   end
 
   defmacro belongs_to(name, opts) do
+    #TODO: Dry up setting up relationships.
     quote bind_quoted: [name: name, opts: opts] do
       @relations [{:belongs_to, name, opts} | @relations]
+      # Define default relation function, make overridable
+      def unquote(name)(model, _conn) do
+        Map.get(model, (unquote(opts)[:field] || unquote(name)))
+      end
+      defoverridable [{name, 2}]
     end
   end
 
@@ -97,10 +128,6 @@ defmodule JsonApi.Serializer do
 
       def as_json(model, conn, meta) do
         JsonApi.Formatter.JsonApiOrg.format(model, __MODULE__, conn, meta)
-        # Relax.Serializer.Format.as_json(model, __MODULE__, conn, meta)
-        # model
-        #   |> JsonApi.Serializer.AbstractFormat.generate(__MODULE__, conn, meta)
-        #   |> JsonApi.Encoder.encode
       end
 
       def location(model) do
@@ -108,58 +135,4 @@ defmodule JsonApi.Serializer do
       end
     end
   end
-
-  defmodule Attributes do
-    def get(serializer, model, conn) do
-      Enum.reduce serializer.__attributes, %{}, fn(attr, results) ->
-        Map.put(results, attr, apply(serializer, attr, [model, conn]))
-      end
-    end
-  end
-
-  defmodule Relationships do
-    def nested(serializer, model, conn) do
-      Enum.reduce serializer.__relations, %{}, fn({type, name, opts}, results) ->
-        nested = nested_relation(serializer, model, conn, {type, name, opts})
-        Map.put(results, name, nested)
-      end
-    end
-
-    defp nested_relation(serializer, model, conn, {type, name, opts}) do
-      if opts[:link] do
-        %{href: JsonApi.Serializer.Location.generate(model, opts[:link])}
-      else
-        nested_ids(serializer, model, conn, {type, name, opts})
-      end
-    end
-
-    # TODO: this could be better.
-    defp nested_ids(serializer, model, conn, {_type, name, opts}) do
-      fun = opts[:fn] || name
-      models_or_ids = apply(serializer, fun, [model, conn])
-      if opts[:serializer] do
-        id_key = opts[:id_key] || :id
-        models_or_ids = Enum.map models_or_ids, &(Map.get(&1, id_key))
-      end
-      models_or_ids
-    end
-
-    @doc """
-      Gets all the resources included directly by the given serializer/model.
-
-      Returns list of tuples {relation_key, serializer, model}
-    """
-    def included(serializer, parent, conn) do
-      serializer.__relations
-      |> Enum.filter(fn({_type, _name, opts}) -> opts[:serializer] end)
-      |> Enum.flat_map &find_included(serializer, parent, conn, &1)
-    end
-
-    defp find_included(parent_serializer, parent, conn, {_, name, opts}) do
-      fun = opts[:fn] || name
-      apply(parent_serializer, fun, [parent, conn])
-      |> Enum.map &({name, opts[:serializer], &1})
-    end
-  end
-
 end
