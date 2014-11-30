@@ -5,8 +5,6 @@ defmodule Blog.Serializers.V1.Comment do
 
   serialize "comments" do
     attributes [:id, :body]
-    belongs_to :post, ids: true
+    belongs_to :post, field: :post_id
   end
-
-  def post(model, _conn), do: model.post_id
 end

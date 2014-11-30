@@ -5,6 +5,7 @@ defmodule Blog.Api.V2.PostsTest do
   alias Blog.Models.Post
   alias Blog.Models.Comment
 
+  @tag :sideload
   test "GET /v2/posts" do
     {:ok, post1} = Post.create(%{title: "foo", body: "baz"})
     {:ok, post2} = Post.create(%{title: "fu",  body: "bar"})
@@ -36,10 +37,10 @@ defmodule Blog.Api.V2.PostsTest do
       ],
       "linked" => %{
         "comments" => [
-          %{"id" => cmnt2.id, "body" => "cmnt2", "links" => %{"post" => post1.id}},
-          %{"id" => cmnt1.id, "body" => "cmnt1", "links" => %{"post" => post1.id}},
           %{"id" => cmnt4.id, "body" => "cmnt4", "links" => %{"post" => post2.id}},
-          %{"id" => cmnt3.id, "body" => "cmnt3", "links" => %{"post" => post2.id}}
+          %{"id" => cmnt3.id, "body" => "cmnt3", "links" => %{"post" => post2.id}},
+          %{"id" => cmnt2.id, "body" => "cmnt2", "links" => %{"post" => post1.id}},
+          %{"id" => cmnt1.id, "body" => "cmnt1", "links" => %{"post" => post1.id}}
         ]
       }
     }
@@ -53,6 +54,7 @@ defmodule Blog.Api.V2.PostsTest do
     assert expected == Poison.decode!(response.resp_body)
   end
 
+  @tag :sideload
   test "GET /v2/posts/:id" do
     {:ok, post1} = Post.create(%{title: "foo", body: "baz"})
     {:ok, cmnt1} = Comment.create(%{body: "cmnt1", post_id: post1.id})
