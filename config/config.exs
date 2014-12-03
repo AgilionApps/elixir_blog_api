@@ -8,7 +8,7 @@ use Mix.Config
 # if you want to provide default values for your application for third-
 # party users, it should be done in your mix.exs file.
 
-config :json_api,
+config :relax,
   root_url: "http://example.com"
 
 # Sample configuration:

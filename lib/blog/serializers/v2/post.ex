@@ -1,5 +1,5 @@
 defmodule Blog.Serializers.V2.Post do
-  use JsonApi.Serializer
+  use Relax.Serializer
 
   path "/v2/posts/:id"
 

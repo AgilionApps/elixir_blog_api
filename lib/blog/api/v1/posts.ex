@@ -1,5 +1,5 @@
 defmodule Blog.Api.V1.Posts do
-  use JsonApi.Resource, except: [:update, :delete]
+  use Relax.Resource, except: [:update, :delete]
   alias Blog.Models.Post
 
   plug :match

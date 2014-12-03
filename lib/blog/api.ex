@@ -1,5 +1,5 @@
 defmodule Blog.Api do
-  use JsonApi.Router
+  use Relax.Router
 
   plug :match
   plug :dispatch

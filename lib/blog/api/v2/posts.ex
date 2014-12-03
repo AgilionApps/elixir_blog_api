@@ -1,9 +1,9 @@
 defmodule Blog.Api.V2.Posts do
   use Plug.Router
-  use JsonApi.Responders
-  use JsonApi.Params
+  use Relax.Responders
+  use Relax.Params
 
-  plug Plug.Parsers, parsers: [JsonApi.PlugParser]
+  plug Plug.Parsers, parsers: [Relax.PlugParser]
   plug :match
   plug :dispatch
   alias Blog.Models.Post

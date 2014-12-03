@@ -1,11 +1,11 @@
 defmodule Blog.Serializers.V2.Comment do
-  use JsonApi.Serializer
+  use Relax.Serializer
 
   path "/v2/comment/:id"
 
   serialize "comments" do
     attributes [:id, :body]
-    belongs_to :post, ids: true
+    has_one :post
   end
 
   def post(model, _conn), do: model.post_id

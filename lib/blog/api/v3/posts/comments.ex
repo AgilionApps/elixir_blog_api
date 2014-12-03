@@ -1,5 +1,5 @@
 defmodule Blog.Api.V3.Post.Comments do
-  use JsonApi.Resource, only: [:find_all]
+  use Relax.Resource, only: [:find_all]
   alias Blog.Models.Comment
 
   plug :match
