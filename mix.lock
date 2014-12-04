@@ -8,4 +8,4 @@
   "poolboy": {:hex, :poolboy, "1.2.1"},
   "postgrex": {:hex, :postgrex, "0.6.0"},
   "ranch": {:hex, :ranch, "1.0.0"},
-  "relax": {:git, "git://github.com/AgilionApps/relax.git", "a624373d8ce8c4de3f8b0dd586edd0ffb7317900", []}}
+  "relax": {:git, "git://github.com/AgilionApps/relax.git", "acd786203ee605be210f1a4d86d5a68846113365", []}}
